@@ -4,7 +4,7 @@ import sensible from "@fastify/sensible";
 import { swaggerPlugin } from "./plugins/swagger.js";
 import { dbPlugin } from "./plugins/db.js";
 
-import { transactionsRoutes } from "./modules/transactions/transactions.route.js";
+import { transactionsRoutes } from "./modules/transactions/transactions.routes.js";
 
 export async function buildApp() {
   const app = Fastify({
