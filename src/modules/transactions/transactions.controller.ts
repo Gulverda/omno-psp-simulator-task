@@ -1,4 +1,5 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import { transactionsService } from "./transactions.service.js";
 
 type CreateTransactionBody = {
   amount: number;
@@ -10,12 +11,15 @@ type CreateTransactionBody = {
 };
 
 export function transactionsController(app: FastifyInstance) {
+  const service = transactionsService(app);
+
   return {
     create: async (
       req: FastifyRequest<{ Body: CreateTransactionBody }>,
       reply: FastifyReply,
     ) => {
-      return reply.code(501).send({ message: "Not implemented yet" });
+      const result = await service.create(req.body);
+      return reply.code(200).send(result);
     },
   };
 }
