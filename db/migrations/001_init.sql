@@ -1,3 +1,5 @@
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 CREATE TABLE IF NOT EXISTS transactions (
   id UUID PRIMARY KEY,
   order_id TEXT NOT NULL,
