@@ -6,6 +6,7 @@ import {
   type TransactionStatus,
 } from "./transactions.domain.js";
 import { transactionsRepo } from "./transactions.repo.js";
+import { config } from "../../shared/config.js";
 
 type CreateTransactionInput = {
   amount: number;
@@ -40,7 +41,6 @@ export function transactionsService(app: FastifyInstance) {
     async create(input: CreateTransactionInput): Promise<ServiceResult> {
       const id = randomUUID();
 
-      // 1) persist initial
       await repo.create({
         id,
         orderId: input.orderId,
@@ -48,7 +48,6 @@ export function transactionsService(app: FastifyInstance) {
         currency: input.currency,
       });
 
-      // 2) call PSP simulator (same app)
       const pspPayload = {
         amount: input.amount,
         currency: input.currency,
@@ -56,27 +55,24 @@ export function transactionsService(app: FastifyInstance) {
         cardExpiry: input.cardExpiry,
         cvv: input.cvv,
         orderId: input.orderId,
-        callbackUrl: "http://127.0.0.1:3000/webhooks/psp",
-        failureUrl: "http://127.0.0.1:3000/failure/psp",
+        callbackUrl: `${config.server.baseUrl}${config.psp.webhookEndpoint}`,
+        failureUrl: `${config.server.baseUrl}${config.psp.failureEndpoint}`,
       };
 
       const pspRes = await postJson<PspResponse>(
-        "http://127.0.0.1:3000/psp/transactions",
+        `${config.server.baseUrl}${config.psp.transactionEndpoint}`,
         pspPayload,
       );
 
-      // 3) state transition
       const nextStatus = mapPspToInternalStatus(pspRes.status);
       assertTransition("CREATED", nextStatus);
 
-      // 4) store psp id + status
       await repo.attachPspIdAndStatus({
         id,
         pspTransactionId: pspRes.transactionId,
         nextStatus,
       });
 
-      // 5) return response
       if (pspRes.status === "PENDING_3DS") {
         return {
           id,

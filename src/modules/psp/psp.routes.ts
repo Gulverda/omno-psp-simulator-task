@@ -84,4 +84,6 @@ export const pspRoutes: FastifyPluginAsync = async (app) => {
       `);
     },
   );
+
+  app.get("/failure/psp", async () => ({ ok: true }));
 };
