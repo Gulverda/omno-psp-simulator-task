@@ -15,8 +15,11 @@
     "type": "git",
     "url": "git+https://github.com/Gulverda/omno-psp-simulator-task.git"
   },
+  "engines": {
+    "node": ">=20"
+  },
   "keywords": [],
-  "author": "",
+  "author": "Luka Gulverdashvili",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/Gulverda/omno-psp-simulator-task/issues"
